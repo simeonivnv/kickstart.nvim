@@ -945,6 +945,7 @@ require('lazy').setup({
   require 'custom.plugins.markdown',
   require 'custom.plugins.markdown-preview',
   require 'custom.plugins.neogit',
+  require 'custom.plugins.snacks',
   require 'custom.plugins.termtoggle',
   require 'custom.plugins.yazi',
 
