@@ -208,6 +208,23 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
+-- [[ Format hunks on save ]]
+local function format_hunks(bufnr)
+  local hunks = require("gitsigns").get_hunks(bufnr)
+  local format = require("conform").format
+  for i = #hunks, 1, -1 do
+    local hunk = hunks[i]
+    if hunk ~= nil and hunk.type ~= "delete" then
+      local start = hunk.added.start
+      local last = start + hunk.added.count
+      -- nvim_buf_get_lines uses zero-based indexing -> subtract from last
+      local last_hunk_line = vim.api.nvim_buf_get_lines(0, last - 2, last - 1, true)[1]
+      local range = { start = { start, 0 }, ["end"] = { last - 1, last_hunk_line:len() } }
+      format({ range = range })
+    end
+  end
+end
+
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
@@ -701,20 +718,17 @@ require('lazy').setup({
     },
     opts = {
       notify_on_error = false,
-      -- format_on_save = function(bufnr)
-      --   -- Disable "format_on_save lsp_fallback" for languages that don't
-      --   -- have a well standardized coding style. You can add additional
-      --   -- languages here or re-enable it for the disabled ones.
-      --   local disable_filetypes = { c = true, cpp = true }
-      --   return {
-      --     timeout_ms = 500,
-      --     lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
-      --   }
-      -- end,
+      format_on_save = function(bufnr)
+        -- Disable "format_on_save lsp_fallback" for languages that don't
+        -- have a well standardized coding style. You can add additional
+        -- languages here or re-enable it for the disabled ones.
+        format_hunks(bufnr)
+      end,
       formatters_by_ft = {
         lua = { 'stylua' },
         c = { 'clang-format' },
         cpp = { 'clang-format' },
+        rb = { 'rubyfmt'},
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
