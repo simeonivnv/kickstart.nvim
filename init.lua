@@ -208,6 +208,15 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
+vim.api.nvim_create_user_command('Copyright', function()
+  local result = os.execute('/home/isimeon/dev/git/vbt-apps-contrib/bin/update-copyrights ' .. vim.fn.expand '%')
+  if result == 0 then
+    vim.notify('✅ Copyright modified', vim.log.levels.INFO)
+  else
+    vim.notify('❌ Copyright failed', vim.log.levels.ERROR)
+  end
+end, {})
+
 -- [[ Format hunks on save ]]
 local function format_hunks(bufnr)
   local hunks = require("gitsigns").get_hunks(bufnr)
@@ -961,6 +970,7 @@ require('lazy').setup({
   require 'custom.plugins.markdown',
   require 'custom.plugins.markdown-preview',
   require 'custom.plugins.neogit',
+  require 'custom.plugins.gh',
   require 'custom.plugins.snacks',
   require 'custom.plugins.termtoggle',
   require 'custom.plugins.yazi',
