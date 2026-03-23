@@ -17,7 +17,22 @@ return {
         wo = { wrap = true }, -- Wrap notifications
       },
     },
-    picker = {},
+    picker = {
+      sources = {
+        grep = {
+          -- This ensures 'rg' is used with specific flags
+          cmd = 'rg',
+          args = {
+            '--column',
+            '--line-number',
+            '--no-heading',
+            '--color=never',
+            '--smart-case',
+            '--hidden', -- Search hidden files
+          },
+        },
+      },
+    },
     explorer = {},
     terminal = {},
   },
