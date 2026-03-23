@@ -18,6 +18,8 @@ return {
       },
     },
     picker = {},
+    explorer = {},
+    terminal = {},
   },
   keys = {
     -- Search pickers (replacing Telescope)
@@ -61,8 +63,20 @@ return {
     { '<leader>gl', function() Snacks.lazygit.log() end, desc = 'Lazygit Log (cwd)' },
 
     -- Terminal
-    { '<c-/>', function() Snacks.terminal() end, desc = 'Toggle Terminal' },
-    { '<c-_>', function() Snacks.terminal() end, desc = 'which_key_ignore' },
+    {
+      '<A-i>',
+      function()
+        Snacks.terminal.toggle(nil, {
+          win = {
+            position = 'float',
+            border = 'rounded', -- Adds that modern UI look
+            width = 0.8, -- 80% of screen width
+            height = 0.8, -- 80% of screen height
+          },
+        })
+      end,
+      desc = 'Toogle Terminal',
+    },
 
     -- Word references
     { ']]', function() Snacks.words.jump(vim.v.count1) end, desc = 'Next Reference', mode = { 'n', 't' } },
