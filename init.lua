@@ -110,13 +110,30 @@ vim.o.mouse = 'a'
 -- Don't show the mode, since it's already in the status line
 vim.o.showmode = false
 
--- Sync clipboard between OS and Neovim.
---  Schedule the setting after `UiEnter` because it can increase startup-time.
---  Remove this option if you want your OS clipboard to remain independent.
---  See `:help 'clipboard'`
-vim.schedule(function() vim.o.clipboard = 'unnamedplus' end)
+-- vim.g.clipboard = {
+--   name = 'OSC 52',
+--   copy = {
+--     ['+'] = require('vim.ui.clipboard.osc52').copy '+',
+--     ['*'] = require('vim.ui.clipboard.osc52').copy '*',
+--   },
+--   paste = {
+--     ['+'] = require('vim.ui.clipboard.osc52').paste '+',
+--     ['*'] = require('vim.ui.clipboard.osc52').paste '*',
+--   },
+-- }
+--
+-- -- Ensures yanks and deletes go to the OS clipboard by default
+-- vim.opt.clipboard = 'unnamedplus'
 
--- vim.g.clipboard = 'osc52'
+vim.api.nvim_create_autocmd('TextYankPost', {
+  desc = 'Push yanked text to OS clipboard via OSC 52',
+  group = vim.api.nvim_create_augroup('YankOSC52', { clear = true }),
+  callback = function()
+    -- Only trigger on actual yanks (like 'y' or 'yy'), not deletes ('d' or 'x')
+    -- This prevents your OS clipboard from being overwritten every time you delete a line.
+    if vim.v.event.operator == 'y' then require('vim.ui.clipboard.osc52').copy '+'(vim.v.event.regcontents) end
+  end,
+})
 
 -- Enable break indent
 vim.o.breakindent = true
